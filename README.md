@@ -2,7 +2,7 @@
 
 This project tests the validity of the **post-earnings announcement drift (PEAD)** anomaly — the idea that stocks with unexpectedly strong earnings continue to drift upward after the announcement, violating the **Efficient Market Hypothesis (EMH)**.
 
-We focus on U.S. equities with **earnings surprises greater than 20%**, and evaluate whether they systematically outperform the **IWM ETF** over short-term horizons.
+We focus on U.S. equities with **earnings surprises greater than 20%**, and evaluate whether they systematically outperform the the **iShares Russell 2000 ETF (IWM)** — an approximate proxy for the overall U.S. equity market — over short-term horizons.
 
 ---
 
@@ -31,7 +31,7 @@ To empirically test if a simple, rules-based strategy built on earnings surprise
 
 functions.py # Data scraping, return calculations, statistical tests
 run.py # Orchestrates full pipeline over one year
-output.xlsx # Intermediate and final results
+output.xlsx # Raw return data for each stock and date
 
 ---
 
@@ -43,7 +43,7 @@ output.xlsx # Intermediate and final results
 | 14-day | 0.44      | 0.37    | 0.06   | 49.7%    |
 | 28-day | 0.60      | 0.37    | 0.07   | 51.8%    |
 
-> These results suggest mild outperformance, but without statistical significance — future segmentation by sector or surprise magnitude may yield deeper insight.
+> These results suggest a mild tendency for high-surprise earnings stocks to outperform the broader market (as proxied by the iShares Russell 2000 ETF), but the effect lacks statistical significance. This aligns with the Efficient Market Hypothesis (EMH), which posits that such information should already be priced in. However, the presence of slight excess returns and win rates near 50% warrants further exploration. Future segmentation by sector, surprise magnitude, or market regime may help uncover persistent inefficiencies or hidden patterns that challenge EMH more directly.
 
 ---
 
