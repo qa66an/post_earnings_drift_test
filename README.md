@@ -27,11 +27,13 @@ To empirically test if a simple, rules-based strategy built on earnings surprise
 
 ---
 
-## 📁 Project Structure
+### 📁 Project Structure
 
-functions.py # Data scraping, return calculations, statistical tests
-run.py # Orchestrates full pipeline over one year
-output.xlsx # Raw return data for each stock and date
+```text
+functions.py     # Handles data scraping, return calculations, and statistical analysis
+run.py           # Orchestrates the full pipeline over one year of earnings data
+output.xlsx      # Raw per-stock return data (base close, post-earnings W/L, etc.)
+```
 
 ---
 
