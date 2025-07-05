@@ -178,18 +178,18 @@ def fetch_and_check_multiticker_closes(ticker_date_dict):
 
 def calculate_average_and_excess_returns_polars(df: pl.DataFrame) -> pl.DataFrame:
     """
-    Given a Polars DataFrame of stock performance including IWV and surprise stocks,
+    Given a Polars DataFrame of stock performance including VTI and surprise stocks,
     this function calculates:
-    - Average return of surprise stocks (excluding IWV) at day 7, 14, 28
-    - IWV return at each offset
-    - Excess return at 7, 14, 28 days (Surprise Avg - IWV)
+    - Average return of surprise stocks (excluding VTI) at day 7, 14, 28
+    - VTI return at each offset
+    - Excess return at 7, 14, 28 days (Surprise Avg - VTI)
 
     Returns:
         Polars DataFrame with columns:
-        Date | Avg day_7 | IWV day_7 | Excess day_7 | ... (for 14, 28)
+        Date | Avg day_7 | VTI day_7 | Excess day_7 | ... (for 14, 28)
     """
-    # 1. Filter out IWV for surprise stock returns
-    surprise_df = df.filter(pl.col("Ticker") != "IWV")
+    # 1. Filter out VTI for surprise stock returns
+    surprise_df = df.filter(pl.col("Ticker") != "VTI")
 
     avg_returns = surprise_df.group_by("Date").agg(
         [
@@ -199,22 +199,22 @@ def calculate_average_and_excess_returns_polars(df: pl.DataFrame) -> pl.DataFram
         ]
     )
 
-    # 2. Get IWV returns for each date
-    IWV_df = df.filter(pl.col("Ticker") == "IWV").select(
+    # 2. Get VTI returns for each date
+    VTI_df = df.filter(pl.col("Ticker") == "VTI").select(
         [
             "Date",
-            pl.col("day_7 W/L").alias("IWV day_7"),
-            pl.col("day_14 W/L").alias("IWV day_14"),
-            pl.col("day_28 W/L").alias("IWV day_28"),
+            pl.col("day_7 W/L").alias("VTI day_7"),
+            pl.col("day_14 W/L").alias("VTI day_14"),
+            pl.col("day_28 W/L").alias("VTI day_28"),
         ]
     )
 
     # 3. Join and calculate excess
-    result = avg_returns.join(IWV_df, on="Date", how="inner").with_columns(
+    result = avg_returns.join(VTI_df, on="Date", how="inner").with_columns(
         [
-            (pl.col("Avg day_7") - pl.col("IWV day_7")).alias("Excess day_7"),
-            (pl.col("Avg day_14") - pl.col("IWV day_14")).alias("Excess day_14"),
-            (pl.col("Avg day_28") - pl.col("IWV day_28")).alias("Excess day_28"),
+            (pl.col("Avg day_7") - pl.col("VTI day_7")).alias("Excess day_7"),
+            (pl.col("Avg day_14") - pl.col("VTI day_14")).alias("Excess day_14"),
+            (pl.col("Avg day_28") - pl.col("VTI day_28")).alias("Excess day_28"),
         ]
     )
 
