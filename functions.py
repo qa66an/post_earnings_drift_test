@@ -13,14 +13,12 @@ import polars as pl
 import numpy as np
 from scipy import stats
 
-# Setup Firefox options
-options = Options()
-options.headless = True  # run in headless mode
-
 
 def get_date_results(date: str) -> pd.DataFrame | None:
     driver = None
     try:
+        options = Options()
+        options.add_argument("--headless")
         driver = webdriver.Firefox(options=options)
         driver.set_page_load_timeout(15)  # timeout for full page load
 
@@ -180,18 +178,18 @@ def fetch_and_check_multiticker_closes(ticker_date_dict):
 
 def calculate_average_and_excess_returns_polars(df: pl.DataFrame) -> pl.DataFrame:
     """
-    Given a Polars DataFrame of stock performance including IWM and surprise stocks,
+    Given a Polars DataFrame of stock performance including IWV and surprise stocks,
     this function calculates:
-    - Average return of surprise stocks (excluding IWM) at day 7, 14, 28
-    - IWM return at each offset
-    - Excess return at 7, 14, 28 days (Surprise Avg - IWM)
+    - Average return of surprise stocks (excluding IWV) at day 7, 14, 28
+    - IWV return at each offset
+    - Excess return at 7, 14, 28 days (Surprise Avg - IWV)
 
     Returns:
         Polars DataFrame with columns:
-        Date | Avg day_7 | IWM day_7 | Excess day_7 | ... (for 14, 28)
+        Date | Avg day_7 | IWV day_7 | Excess day_7 | ... (for 14, 28)
     """
-    # 1. Filter out IWM for surprise stock returns
-    surprise_df = df.filter(pl.col("Ticker") != "IWM")
+    # 1. Filter out IWV for surprise stock returns
+    surprise_df = df.filter(pl.col("Ticker") != "IWV")
 
     avg_returns = surprise_df.group_by("Date").agg(
         [
@@ -201,22 +199,22 @@ def calculate_average_and_excess_returns_polars(df: pl.DataFrame) -> pl.DataFram
         ]
     )
 
-    # 2. Get IWM returns for each date
-    iwm_df = df.filter(pl.col("Ticker") == "IWM").select(
+    # 2. Get IWV returns for each date
+    IWV_df = df.filter(pl.col("Ticker") == "IWV").select(
         [
             "Date",
-            pl.col("day_7 W/L").alias("IWM day_7"),
-            pl.col("day_14 W/L").alias("IWM day_14"),
-            pl.col("day_28 W/L").alias("IWM day_28"),
+            pl.col("day_7 W/L").alias("IWV day_7"),
+            pl.col("day_14 W/L").alias("IWV day_14"),
+            pl.col("day_28 W/L").alias("IWV day_28"),
         ]
     )
 
     # 3. Join and calculate excess
-    result = avg_returns.join(iwm_df, on="Date", how="inner").with_columns(
+    result = avg_returns.join(IWV_df, on="Date", how="inner").with_columns(
         [
-            (pl.col("Avg day_7") - pl.col("IWM day_7")).alias("Excess day_7"),
-            (pl.col("Avg day_14") - pl.col("IWM day_14")).alias("Excess day_14"),
-            (pl.col("Avg day_28") - pl.col("IWM day_28")).alias("Excess day_28"),
+            (pl.col("Avg day_7") - pl.col("IWV day_7")).alias("Excess day_7"),
+            (pl.col("Avg day_14") - pl.col("IWV day_14")).alias("Excess day_14"),
+            (pl.col("Avg day_28") - pl.col("IWV day_28")).alias("Excess day_28"),
         ]
     )
 

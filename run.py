@@ -51,26 +51,29 @@ for date in dates:
                 (
                     (pl.col("charr") == "T")
                     | (pl.col("charr") == "B")
-                    | ((pl.col("charr") == "M") & (pl.col("market_cap_clean") > 500))
+                    | ((pl.col("charr") == "M"))
                 )
                 & (pl.col("eps_estimate_clean") > 0)
                 & (pl.col("reported_eps_clean") > 0)
                 & (pl.col("Surprise (%)") > 20)
             )
-
+            # & (pl.col("market_cap_clean") > 500)
             print(date)
             # print(pl_df)
             # print(filtered_df)
             tickers_dates = {
                 row["Symbol"]: date for row in filtered_df.head(5).to_dicts()
             }
-            tickers_dates["IWM"] = date
-            print(tickers_dates)
-            res = fetch_and_check_multiticker_closes(tickers_dates)
-            df = results_to_polars(res)
-            df = df.with_columns(pl.lit(date).alias("Date"))
-            # print(df)
-            all_rows.append(df)
+            if len(tickers_dates) > 0:
+                tickers_dates["VTI"] = date
+                print(tickers_dates)
+                res = fetch_and_check_multiticker_closes(tickers_dates)
+                df = results_to_polars(res)
+                df = df.with_columns(pl.lit(date).alias("Date"))
+                # print(df)
+                all_rows.append(df)
+            else:
+                print("No valid tickers found")
         except Exception as e:
             print(f"Error processing {date}: {e}")
 
